@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+
+################################################################################
+#                                                                              #
+#                                                                              #
+#                               pacmanToolBelt                                 #
+#                                                                              #
+# Created By: S4NDM4N                                           Version: 0.0.1 #
+################################################################################
+
+#Check su or sudo available.
+sudoCheck(){
+    
+    local chkSudo
+    local chkSu
+
+    chkSudo=$(sudo -nv 2>&1)
+    chkSu=$(su -nv 2>&1)
+
+    if echo "$chkSudo" | grep -q '^sudo:'; then
+        echo "sudo"
+    elif echo "$chkSu" | grep -q '^su:'; then
+        echo "su"
+    else
+        echo "non"
+    fi
+
+}
+
+setSudo(){
+    
+    suChk=$(sudoCheck)
+
+    case "$suChk" in
+        "sudo") echo "sudo" ;;
+        "su") echo "su" ;;
+        *) exit 1  ;;
+    esac
+}
+
+#Creating the UI using YAD.
+pacTools=$(yad --width=400 --entry --title="Pacman Tool Belt" \
+        --image=gtk-convert --window-icon=gtk-convert \
+        --button="Execute:0" --button="Close:1" \
+        --text="Choose the commande you want the tool belt to run" \
+        --entry-text "pac update" "pac upgrade" "pac check")
+
+btnChoice=$? #Get the clicked button numbers and assignes it to choice variable.
+
+[[ $btnChoice -eq 1 ]] && exit 0
+
+#Looping through pacTools to get the selected command choice.
+set_Sudo=$(setSudo)
+
+case $pacTools in
+    *update) cmd="$set_Sudo pacman -Sy"   ;;
+    *upgrade) cmd="$set_Sudo pacman -Syu" ;;
+    *check) cmd="yad --width=100 --title='msg' --text='Working'" ;;
+    *) exit 1 ;;
+esac
+
+eval exec "$cmd"

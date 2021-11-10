@@ -8,6 +8,29 @@
 # Created By: S4NDM4N                                           Version: 0.0.1 #
 ################################################################################
 
+#To echo the messages
+printLine(){ echo "@" >&2 ; }
+
+#Sources in  eos-shared and checks for the shared script.
+commonScriptCehck(){
+    
+    local LIB_EOS_SCRIPT=source /usr/share/endeavouros/scripts/eos-script-lib-yad
+
+    if [ ! -f $LIB_EOS_SCRIPT ] ; then
+        printLine "Please installe 'eos-bash-share' for this script to work."
+        exit 1
+    fi
+
+    #Imports in all the goodness from the eos-shared lib.
+    source $LIB_EOS_SCRIPT
+
+    #export the needed functions.
+    #export -f eos_yad
+    export -f eos_yab_RunCmdTermBash
+    export -f eos_yad_teminal
+
+}
+
 #Check su or sudo available.
 sudoCheck(){
     
@@ -27,6 +50,7 @@ sudoCheck(){
 
 }
 
+#After checking echos the right one and assignes the right one the variable.
 setSudo(){
     
     suChk=$(sudoCheck)
@@ -39,24 +63,33 @@ setSudo(){
 }
 
 #Creating the UI using YAD.
-pacTools=$(yad --width=400 --entry --title="Pacman Tool Belt" \
-        --image=gtk-convert --window-icon=gtk-convert \
-        --button="Execute:0" --button="Close:1" \
-        --text="Choose the commande you want the tool belt to run" \
-        --entry-text "pac update" "pac upgrade" "pac check")
+mainFunstionSet(){
 
-btnChoice=$? #Get the clicked button numbers and assignes it to choice variable.
+#Text for the UI.
+local lbl=""
+lbl+="Wlecome to pacmanToolBelt\n"
+lbl+="This is simple <b>UI</b> for pacman. It runs some simple commen commands\n"
+lbl+="with out typing in the terminal.\n"
 
-[[ $btnChoice -eq 1 ]] && exit 0
+local windowContent=(
+    yad --form --align-buttons --use-interp --title="Pacman Tool Belt"
+    --text="$lbl" --image=gtk-convert --window-icon=gtk-convert --columns=2
+)
 
-#Looping through pacTools to get the selected command choice.
-set_Sudo=$(setSudo)
+    windowContent+=(
+        --field="Update!application-internet!Synchronize the databases":fbtn "RunInTerminal setSudo pacman -Sy"
+    )
 
-case $pacTools in
-    *update) cmd="$set_Sudo pacman -Sy"   ;;
-    *upgrade) cmd="$set_Sudo pacman -Syu" ;;
-    *check) cmd="yad --width=100 --title='msg' --text='Working'" ;;
-    *) exit 1 ;;
-esac
+    windowContent+=(
+        --field="Update!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal setSudo pacman -Syu"
+    )
 
-eval exec "$cmd"
+    windowContent+=(
+        --field="Update!preferences-system!Search for the software in te repos":fbtn 'enterSoftwareName'
+    )
+
+    windowContent+=(
+        --field="Update!preferences-system!Search for installed software details":fbtn 'enterSoftwareName'
+    )
+
+}

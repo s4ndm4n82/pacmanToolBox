@@ -92,47 +92,53 @@ setSudo(){
 #}
 
 sftNameRepo(){
+    #Variable decleration.
     local nme=()
-    local sName=""
+    local searchName=""
     local result=""
     local text=""
     local check=0
 
+    #Bulding the text message for the GUI.
     text+="Enter the name of the sofwate you want to search\n"
     text+="in the official repository."
 
-#TODO:
-#   Make while ... do loop to loop the below command until user enters a value.
-
     while
-    local nme=(
+    nme=(
         yad --form --align-buttons --use-interp --title="Software Name" \
         --text="$text" --field=""       
     )
     
+    #Assign the above YAD array to a new local variable named result.
+    #Checks if it's set if not it's returned.
     result="$("${nme[@]}")" ; [ -n "$result" ] || return
     
-    sName="$(echo "$result" | cut -d '|' -f1)"
+    #Cut the result varible from the 1 st itteration of text to get the search string.
+    searchName="$(echo "$result" | cut -d '|' -f1)"
 
-    if [[ -n "$sName" ]]; then
+    #Check if above searchName is set or not. If set then set the check to 1
+    #which would execute the 1st command from the below case statement.
+    if [[ -n "$searchName" ]]; then
         check=1
     fi    
 
         case "$check" in
-            0) if [[ -z "$sName" ]]; then 
+            #If the above searchName is not set then sets check to 2
+            0) if [[ -z "$searchName" ]]; then 
                 check=2
                fi ;;
-            1) RunInTerminal echo "$sName" ;;
+            1) RunInTerminal pacman -Ss "$searchName" ;;
             *) ;;
         esac
     
-
+    #If check is equal to 2 then execute the error message.
+    #And will throw the loop to top which will show the UI until user search
+    #or cancels.
     [[ "$check" -eq 2 ]]
     do
         yad --form --use-interp image="error" --text-align=left \
         --text="Name field cannot be empty" --title="Empty Field" \
-        --width=300 --button="OK!gtk-close!Click to close.":0 ;done
-    #    RunInTerminal echo "$check" ; done
+        --width=300 --button="OK!gtk-close!Click to close.":0 ;done    
 }
 export -f sftNameRepo
 

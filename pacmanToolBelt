@@ -166,23 +166,23 @@ local windowContent=(
 )   
 
     windowContent+=(
-        --field="Update Databases!application-internet!Synchronize the databases":fbtn "RunInTerminal $(setSudo) pacman -Sy"
+        --field="Update Databases!system-run!Synchronize the databases":fbtn "RunInTerminal $(setSudo) pacman -Sy"
     )
 
     windowContent+=(
-        --field="Force update Databases!application-internet!Force synchornize the databases":fbtn "RunInTerminal $(setSudo) pacman -Syy"
+        --field="Force update Databases!system-run!Force synchornize the databases":fbtn "RunInTerminal $(setSudo) pacman -Syy"
     )
 
     windowContent+=(
-        --field="System Upgrade!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syu"
+        --field="System Upgrade!system-run!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syu"
     )
 
     windowContent+=(
-        --field="System Force Upgrade!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syyu"
+        --field="System Force Upgrade!system-run!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syyu"
     )
 
     windowContent+=(
-        --field="Safe System Upgrade for NVIDIA!application-system!Upgrade the system safly if you have NVIDIA":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+        --field="Safe System Upgrade for NVIDIA!system-run!Upgrade the system safly if you have NVIDIA":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
     )
 
     windowContent+=(
@@ -218,7 +218,7 @@ local windowContent=(
     )
 
     windowContent+=(
-        --field="Clean Sync Databases!list-remove!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
+        --field="Clean Sync Databases!document-clear!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
     )
 
     [ "$handle" != "calculate" ] && "${windowContent[@]}" >& /dev/null &
@@ -226,4 +226,8 @@ local windowContent=(
     [[ $exitBtn -eq 0 ]] && exit 0
 }
 
+trap "sleep 0.2 ; eos-kill-yad-zombies --silent" EXIT
+
 mainFunstionSet "$@"
+
+exit 0

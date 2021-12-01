@@ -25,7 +25,6 @@ commonScriptCehck(){
     source $LIB_EOS_SCRIPT
 
     #export the needed functions.
-    #export -f eos_yad
     export -f eos_yab_RunCmdTermBash
     export -f eos_yad_teminal
 
@@ -187,39 +186,39 @@ local windowContent=(
     )
 
     windowContent+=(
-        --field="Search Software!preferences-system!Search for the software in the repos":fbtn 'sftNameRepo "Ss"'
+        --field="Search Software!system-search!Search for the software in the repos":fbtn 'sftNameRepo "Ss"'
     )
     
     windowContent+=(
-        --field="Software Information!preferences-system!Search for software information in the repos":fbtn 'sftNameRepo "Si"'
+        --field="Software Information!system-search!Search for software information in the repos":fbtn 'sftNameRepo "Si"'
     )
 
     windowContent+=(
-        --field="Search Installed Software!preferences-system!Search the local system for installed software.":fbtn "RunInTerminal $(setSudo) pacman -Qs"
+        --field="Search Installed Software!system-search!Search the local system for installed software.":fbtn "RunInTerminal $(setSudo) pacman -Qs"
     )
 
     windowContent+=(
-        --field="Installed Software Information!preferences-system!Search for installed software details.":fbtn 'sftNameRepo "Qi"'
+        --field="Installed Software Information!system-search!Search for installed software details.":fbtn 'sftNameRepo "Qi"'
     )
 
     windowContent+=(
-        --field="Find Package With Filename or App!preferences-system!Finds the package that includes a file or app.":fbtn 'sftNameRepo "Qo"'
+        --field="Find Package With Filename or App!system-search!Finds the package that includes a file or app.":fbtn 'sftNameRepo "Qo"'
     )
 
     windowContent+=(
-        --field="List the Files of the Package!preferences-system!Lists files of a package.":fbtn 'sftNameRepo "Qi"'
+        --field="List the Files of the Package!system-search!Lists files of a package.":fbtn 'sftNameRepo "Qi"'
     )
 
     windowContent+=(
-        --field="Softremove An Application!face-worried!Lists files of a package.":fbtn 'sftNameRepo "R"'
+        --field="Softremove An Application!list-remove!Lists files of a package.":fbtn 'sftNameRepo "R"'
     )
 
     windowContent+=(
-        --field="Hardremove An Application!face-crying!Lists files of a package.":fbtn 'sftNameRepo "Rnsc"'
+        --field="Hardremove An Application!list-remove!Lists files of a package.":fbtn 'sftNameRepo "Rnsc"'
     )
 
     windowContent+=(
-        --field="Clean Sync Databases!application-syste!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
+        --field="Clean Sync Databases!list-remove!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
     )
 
     [ "$handle" != "calculate" ] && "${windowContent[@]}" >& /dev/null &

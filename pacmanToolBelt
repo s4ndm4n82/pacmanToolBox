@@ -9,7 +9,7 @@
 ################################################################################
 
 #To echo the messages
-printLine(){ echo "@" >&2 ; }
+printLine(){ echo "$@" >&2 ; }
 
 #Sources in  eos-shared and checks for the shared script.
 commonScriptCehck(){
@@ -61,35 +61,170 @@ setSudo(){
         *) exit 1  ;;
     esac
 }
+export -f setSudo
+
+sftNameRepo(){
+    #Variable decleration.
+    local searchSwitch="$1"
+    local ui=()
+    local eui=()
+    local searchName=""
+    local result=""
+    local text=""
+
+    #Bulding the text message for the GUI.
+    case $searchSwitch in
+        Ss)
+            text+="Enter the name of the software you want to search\n"
+            text+="in the official repository."
+            ;;
+        Qi)
+            text+="Enter the name of the installed software you want to search\n"
+            text+="on your local machine."
+            ;;
+        Si)
+            text+="Enter the name of the software you want to search\n"
+            text+="information of. From the repositories."
+            ;;
+        Qs)
+            text+="Enter the name of the software you want to search\n"
+            text+="in the local machine."
+            ;;
+        Qo)
+            text+="Enter the name of a file or a software. To find the\n"
+            text+="package containing it."
+            ;;
+        R)
+            text+="Enter the name of the software you want to remove\n"
+            text+="from your system."
+            ;;
+        Rnsc)
+            text+="Enter the name of the software you want to remove\n"
+            text+="from your system with dependensis."
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+
+    ui=(
+        yad --form --align-buttons --use-interp --title="Software Name" \
+        --text="$text" --field="" --button="Close!gtk-close!Click to close":1 \
+        --button="Search!gtk-ok!Click to search":0
+    )
+
+    eui=(
+        yad --form --align --use-interp image="error" \
+        --text-align=center --text="Software name cannot be empty" \
+        --title="Empty Field" --width=300 --buttons-layout=center \
+        --button="OK!gtk-ok!Click to close."
+    )
+
+    #While loop begins. Keeps looping till close is pressed.
+    while true; do            
+     
+    result="$("${ui[@]}")"
+
+    # Now check yad command return code which was
+    # delivered by one of the OK and Cancel buttons:
+        case $? in
+            0)
+                # OK button was clicked
+                searchName="$(echo "$result" | cut -d '|' -f1)"
+                if [ -n "$searchName" ] ; then
+                    RunInTerminal pacman -$searchSwitch $searchName
+                    return 0
+                else
+                    # Show yad window for the error,
+                    # then simply continue the loop.
+                    "${eui[@]}"
+                fi
+                ;;
+            *)
+                # Cancel button was clicked
+                return 1
+                ;;
+        esac
+    done
+}
+export -f sftNameRepo
 
 #Creating the UI using YAD.
 mainFunstionSet(){
+local handle="$1"
+local exitBtn="$?"
 
 #Text for the UI.
-local lbl=""
-lbl+="Wlecome to pacmanToolBelt\n"
-lbl+="This is simple <b>UI</b> for pacman. It runs some simple commen commands\n"
-lbl+="with out typing in the terminal.\n"
+local lbl=""    
+lbl+="<b>Wlecome to pacmanToolBelt</b>\n"
+lbl+="This is simple <b>UI for pacman</b>. It runs some simple commen commands with out typing them in\n"
+lbl+="the terminal.\n"
 
 local windowContent=(
-    yad --form --align-buttons --use-interp --title="Pacman Tool Belt"
-    --text="$lbl" --image=gtk-convert --window-icon=gtk-convert --columns=2
-)
+    yad --form --align-buttons --use-interp --title="Pacman Tool Belt" \
+    --text="$lbl" --image=gtk-convert --window-icon=gtk-convert --columns=3 \
+    --button="Close!gtk-close!Close the app.":0
+)   
 
     windowContent+=(
-        --field="Update!application-internet!Synchronize the databases":fbtn "RunInTerminal setSudo pacman -Sy"
+        --field="Update Databases!application-internet!Synchronize the databases":fbtn "RunInTerminal $(setSudo) pacman -Sy"
     )
 
     windowContent+=(
-        --field="Update!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal setSudo pacman -Syu"
+        --field="Force update Databases!application-internet!Force synchornize the databases":fbtn "RunInTerminal $(setSudo) pacman -Syy"
     )
 
     windowContent+=(
-        --field="Update!preferences-system!Search for the software in te repos":fbtn 'enterSoftwareName'
+        --field="System Upgrade!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syu"
     )
 
     windowContent+=(
-        --field="Update!preferences-system!Search for installed software details":fbtn 'enterSoftwareName'
+        --field="System Force Upgrade!application-system!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syyu"
     )
 
+    windowContent+=(
+        --field="Safe System Upgrade for NVIDIA!application-system!Upgrade the system safly if you have NVIDIA":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+    )
+
+    windowContent+=(
+        --field="Search Software!preferences-system!Search for the software in the repos":fbtn 'sftNameRepo "Ss"'
+    )
+    
+    windowContent+=(
+        --field="Software Information!preferences-system!Search for software information in the repos":fbtn 'sftNameRepo "Si"'
+    )
+
+    windowContent+=(
+        --field="Search Installed Software!preferences-system!Search the local system for installed software.":fbtn "RunInTerminal $(setSudo) pacman -Qs"
+    )
+
+    windowContent+=(
+        --field="Installed Software Information!preferences-system!Search for installed software details.":fbtn 'sftNameRepo "Qi"'
+    )
+
+    windowContent+=(
+        --field="Find Package With Filename or App!preferences-system!Finds the package that includes a file or app.":fbtn 'sftNameRepo "Qo"'
+    )
+
+    windowContent+=(
+        --field="List the Files of the Package!preferences-system!Lists files of a package.":fbtn 'sftNameRepo "Qi"'
+    )
+
+    windowContent+=(
+        --field="Softremove An Application!face-worried!Lists files of a package.":fbtn 'sftNameRepo "R"'
+    )
+
+    windowContent+=(
+        --field="Hardremove An Application!face-crying!Lists files of a package.":fbtn 'sftNameRepo "Rnsc"'
+    )
+
+    windowContent+=(
+        --field="Clean Sync Databases!application-syste!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
+    )
+
+    [ "$handle" != "calculate" ] && "${windowContent[@]}" >& /dev/null &
+
+    [[ $exitBtn -eq 0 ]] && exit 0
 }
+
+mainFunstionSet "$@"

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Encoding=UTF-8
+Name=pacmanToolBox
+Comment=pacmanToolBox a simple UI to es the use of pacman pakage manager for Arch.
+Exec=pacmanToolBox
+Icon=ptb-icon
+Hidden=false
+X-GNOME-Autostart-enabled=true
+X-KDE-autostart-after=panel
+Categories=System

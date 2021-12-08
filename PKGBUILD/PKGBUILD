@@ -1,1 +1,39 @@
-##!/usr/bin/env bash
+#!/usr/bin/env bash
+# Maintainer: S4NDM4N <sadaruwan12@gmail.com>
+
+pkgname=pacmanToolBox
+pkgdesc="pacmanToolBox a simple UI to es the use of pacman pakage manager for Arch."
+
+pkgver=0.0.1
+pkgrel=1
+
+arch=('any')
+url="https://gitlab.com/s4ndm4n82/$pkgname/-/tree/main"
+license=('GPL')
+groups=()
+depends=()
+makedepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=($pkgname-$pkgver.tar.gz)
+noextract=()
+md5sums=() #autofill using updpkgsums
+
+build() {
+  cd "$pkgname-$pkgver"
+
+  ./configure --prefix=/usr
+  make
+}
+
+package() {
+  cd "$pkgname-$pkgver"
+
+  make DESTDIR="$pkgdir/" install
+}

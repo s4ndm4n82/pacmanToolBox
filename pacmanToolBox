@@ -3,7 +3,7 @@
 ################################################################################
 #                                                                              #
 #                                                                              #
-#                               pacmanToolBelt                                 #
+#                               pacmanToolBox                                 #
 #                                                                              #
 # Created By: S4NDM4N                                           Version: 0.0.1 #
 ################################################################################
@@ -25,6 +25,7 @@ commonScriptCehck(){
     source $LIB_EOS_SCRIPT
 
     #export the needed functions.
+    export -f eos_yad
     export -f eos_yab_RunCmdTermBash
     export -f eos_yad_teminal
 

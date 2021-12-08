@@ -8,32 +8,27 @@ pkgver=0.0.1
 pkgrel=1
 
 arch=('any')
-url="https://gitlab.com/s4ndm4n82/$pkgname/-/tree/main"
-license=('GPL')
-groups=()
-depends=()
-makedepends=()
-optdepends=()
-provides=()
-conflicts=()
-replaces=()
-backup=()
-options=()
-install=
-changelog=
-source=($pkgname-$pkgver.tar.gz)
-noextract=()
-md5sums=() #autofill using updpkgsums
+url="https://gitlab.com/s4ndm4n82/$pkgname/-/tree/main/"
+urlraw="https://gitlab.com/s4ndm4n82/$pkgname/-/raw/main"
 
-build() {
-  cd "$pkgname-$pkgver"
+license=('MIT')
 
-  ./configure --prefix=/usr
-  make
-}
+depends=(
+    eos-bash-shared
+    eos-script-lib-yad
+    bash
+    yad
+)
+source=(
+    "$urlraw/$pkgname"
+)
+
+sha512sum=(
+    '43a6741bcd1b4fc7976a01a77cb7dc2ee9c81327c3bf5acd0855942618899425338d10b5c884871109a3ad7e293b28637942602fe1a411aa00c1affcd2e4830a'
+    )
 
 package() {
-  cd "$pkgname-$pkgver"
+  
+  install -Dm755 $pkgname       $pkgdir/usr/bin/$pkgname
 
-  make DESTDIR="$pkgdir/" install
 }

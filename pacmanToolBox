@@ -30,9 +30,6 @@ checkShared(){
     export -f callTerminal
 }
 
-#checkShared # Calling the above funtion so rest of the app runs
-
-
 #Check su or sudo available.
 sudoCheck(){
     
@@ -155,7 +152,7 @@ export -f sftNameRepo
 mainFunstionSet(){
 
 #Calling the runction to source in all the files and functions needed.    
-checkShared
+checkShared "$@"
 
 #Local variable assignement.
 local handle="$1"

@@ -151,7 +151,8 @@ export -f sftNameRepo
 #Creating the UI using YAD.
 mainFunstionSet(){
 
-#Calling the runction to source in all the files and functions needed.    
+# Calling the runction to source in all the files and functions needed.
+# But nothing is delivered to the function. Added '$@' just for good messure.
 checkShared "$@"
 
 #Local variable assignement.

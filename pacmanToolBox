@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+
 ################################################################################
 #                                                                              #
 #                                                                              #
@@ -11,25 +12,26 @@
 #To echo the messages
 printLine(){ echo "$@" >&2 ; }
 
-#Sources in  eos-shared and checks for the shared script.
-commonScriptCehck(){
-    
-    local LIB_EOS_SCRIPT=source /usr/share/endeavouros/scripts/eos-script-lib-yad
+#Sources in  my shared library and checks for the shared script.
+checkShared(){
+    local LIB_SHRD_SCRIPT=/home/s4ndm4n/MEGA/GitRepoShare/Repos/sharedLib/sharedFunctionsLib
 
-    if [ ! -f $LIB_EOS_SCRIPT ] ; then
-        printLine "Please installe 'eos-bash-share' for this script to work."
+    if [ ! -f $LIB_SHRD_SCRIPT ] ; then
+        printLine "Shared function library used for this script is missing."
         exit 1
     fi
 
     #Imports in all the goodness from the eos-shared lib.
-    source $LIB_EOS_SCRIPT
+    #shellcheck source=/dev/null
+    source $LIB_SHRD_SCRIPT
 
-    #export the needed functions.
-    export -f eos_yad
-    export -f eos_yab_RunCmdTermBash
-    export -f eos_yad_teminal
-
+    export -f yadRunCmd
+    export -f runTerm
+    export -f callTerminal
 }
+
+#checkShared # Calling the above funtion so rest of the app runs
+
 
 #Check su or sudo available.
 sudoCheck(){
@@ -108,16 +110,16 @@ sftNameRepo(){
     esac
 
     ui=(
-        yad --form --align-buttons --use-interp --title="Software Name" \
+        yadRunCmd --form --align-buttons --use-interp --title="Software Name" \
         --text="$text" --field="" --button="Close!gtk-close!Click to close":1 \
-        --button="Search!gtk-ok!Click to search":0
+        --window-icon=$APP_TOOLBOX_ICON64 --button="Search!gtk-ok!Click to search":0
     )
 
     eui=(
-        yad --form --align --use-interp image="error" \
+        yadRunCmd --form --align --use-interp image="error" \
         --text-align=center --text="Software name cannot be empty" \
         --title="Empty Field" --width=300 --buttons-layout=center \
-        --button="OK!gtk-ok!Click to close."
+        --window-icon=$APP_TOOLBOX_ICON64 --button="OK!gtk-ok!Click to close."
     )
 
     #While loop begins. Keeps looping till close is pressed.
@@ -132,7 +134,7 @@ sftNameRepo(){
                 # OK button was clicked
                 searchName="$(echo "$result" | cut -d '|' -f1)"
                 if [ -n "$searchName" ] ; then
-                    RunInTerminal pacman -$searchSwitch $searchName
+                    cmdRun pacman -$searchSwitch $searchName
                     return 0
                 else
                     # Show yad window for the error,
@@ -151,6 +153,11 @@ export -f sftNameRepo
 
 #Creating the UI using YAD.
 mainFunstionSet(){
+
+#Calling the runction to source in all the files and functions needed.    
+checkShared
+
+#Local variable assignement.
 local handle="$1"
 local exitBtn="$?"
 
@@ -161,29 +168,29 @@ lbl+="This is simple <b>UI for pacman</b>. It runs some simple commen commands w
 lbl+="the terminal.\n"
 
 local windowContent=(
-    yad --form --align-buttons --use-interp --title="Pacman Tool Belt" \
-    --text="$lbl" --image=gtk-convert --window-icon=gtk-convert --columns=3 \
+    yadRunCmd --form --align-buttons --use-interp --title="Pacman Tool Belt" \
+    --text="$lbl" --image=$APP_TOOLBOX_ICON64 --window-icon=$APP_TOOLBOX_ICON64 --columns=3 \
     --button="Close!gtk-close!Close the app.":0
 )   
 
     windowContent+=(
-        --field="Update Databases!system-run!Synchronize the databases":fbtn "RunInTerminal $(setSudo) pacman -Sy"
+        --field="Update Databases!system-run!Synchronize the databases":fbtn "cmdRun $(setSudo) pacman -Sy"
     )
 
     windowContent+=(
-        --field="Force update Databases!system-run!Force synchornize the databases":fbtn "RunInTerminal $(setSudo) pacman -Syy"
+        --field="Force update Databases!system-run!Force synchornize the databases":fbtn "cmdRun $(setSudo) pacman -Syy"
     )
 
     windowContent+=(
-        --field="System Upgrade!system-run!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syu"
+        --field="System Upgrade!system-run!Synchronize the databases and install updates":fbtn "cmdRun $(setSudo) pacman -Syu"
     )
 
     windowContent+=(
-        --field="System Force Upgrade!system-run!Synchronize the databases and install updates":fbtn "RunInTerminal $(setSudo) pacman -Syyu"
+        --field="System Force Upgrade!system-run!Synchronize the databases and install updates":fbtn "cmdRun $(setSudo) pacman -Syyu"
     )
 
     windowContent+=(
-        --field="Safe System Upgrade for NVIDIA!system-run!Upgrade the system safly if you have NVIDIA":fbtn "RunInTerminal UpdateInTerminal --lang=$lang"
+        --field="Safe System Upgrade for NVIDIA!system-run!Upgrade the system safly if you have NVIDIA":fbtn "cmdRun UpdateInTerminal --lang=$lang"
     )
 
     windowContent+=(
@@ -195,7 +202,7 @@ local windowContent=(
     )
 
     windowContent+=(
-        --field="Search Installed Software!system-search!Search the local system for installed software.":fbtn "RunInTerminal $(setSudo) pacman -Qs"
+        --field="Search Installed Software!system-search!Search the local system for installed software.":fbtn "cmdRun $(setSudo) pacman -Qs"
     )
 
     windowContent+=(
@@ -219,7 +226,7 @@ local windowContent=(
     )
 
     windowContent+=(
-        --field="Clean Sync Databases!document-clear!Lists files of a package.":fbtn 'RunInTerminal pacman -Scc'
+        --field="Clean Sync Databases!document-clear!Lists files of a package.":fbtn 'cmdRun pacman -Scc'
     )
 
     [ "$handle" != "calculate" ] && "${windowContent[@]}" >& /dev/null &
